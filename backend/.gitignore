@@ -1,3 +1,5 @@
 .idea
 migrations
 venv
+config.py
+__pycache__
