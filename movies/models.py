@@ -32,11 +32,12 @@ class Movie(models.Model):
     poster = models.CharField(max_length=256, null=True, blank=True)
     backdrop = models.CharField(max_length=256, null=True, blank=True)
     language = models.ForeignKey(to='Language', on_delete=models.CASCADE)
+    countries = models.ManyToManyField(to='ProductionCountry', blank=True)
     trailer = models.CharField(max_length=1024, blank=True, null=True)
-    director = models.ManyToManyField(to='people.Director', blank=True)
-    photography_director = models.ManyToManyField(to='people.PhotographyDirector', blank=True)
-    screenwriter = models.ManyToManyField(to='people.ScreenWriter', blank=True)
-    producer = models.ManyToManyField(to='people.Producer', blank=True)
+    directors = models.ManyToManyField(to='people.Director', blank=True)
+    photography_directors = models.ManyToManyField(to='people.PhotographyDirector', blank=True)
+    screenwriters = models.ManyToManyField(to='people.ScreenWriter', blank=True)
+    producers = models.ManyToManyField(to='people.Producer', blank=True)
     cast = models.ManyToManyField(to='people.Star', blank=True)
     genres = models.ManyToManyField(to='Genre', blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
@@ -72,3 +73,16 @@ class Language(models.Model):
 
     def __str__(self):
         return language(self.language_iso)['Name']
+
+
+class ProductionCountry(models.Model):
+    """
+    Defines a model for countries
+    country_iso: the iso code of the country
+    country_name: the name of the country
+    """
+    country_iso = models.CharField(max_length=32)
+    country_name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.country_name
