@@ -1,12 +1,16 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group, User
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 from users.forms import UserAdminChangeForm, UserAdminCreationForm
+from users.models import User
 
 
-class UserAdmin(UserAdmin):
+class MovieSeenAdmin(admin.TabularInline):
+    model = User.movies_seen.through
+
+
+class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
@@ -18,7 +22,7 @@ class UserAdmin(UserAdmin):
     list_filter = ('admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password',)}),
-        ('Personal info', {'fields': ('name', 'lastname', 'favorites_people', 'favorites_movies')}),
+        ('Personal info', {'fields': ('name', 'lastname', 'favorites_stars', 'favorites_directors', 'favorites_movies')}),
         ('Permissions', {'fields': ('admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -26,9 +30,10 @@ class UserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('name', 'lastname', 'email', 'password1', 'password2', 'favorites_people', 'favorites_movies')}
+            'fields': ('name', 'lastname', 'email', 'password1', 'password2', 'favorites_stars', 'favorites_directors', 'favorites_movies',)}
         ),
     )
+    inlines = (MovieSeenAdmin,)
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()

@@ -7,7 +7,21 @@ from people.models import People
 from users.managers import UserManager
 
 
+class MovieSeen(models.Model):
+    """
+    MovieSeen keeps track of the movies seen by the user
+    """
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE)
+    movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('user', 'movie'),)
+
+
 class User(AbstractBaseUser, PermissionsMixin):
+    """
+    Custom user class which includes favorites movies, favorites people
+    """
     email = models.EmailField(
         verbose_name='email_address',
         max_length=255,
@@ -18,8 +32,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     active = models.BooleanField(default=True)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    favorites_movies = models.ManyToManyField(to=Movie, blank=True)
-    favorites_people = models.ManyToManyField(to=People, blank=True)
+    favorites_movies = models.ManyToManyField(to=Movie, related_name='favorite_movies', blank=True)
+    favorites_stars = models.ManyToManyField(to='people.Star', related_name='favorite_stars',blank=True)
+    favorites_directors = models.ManyToManyField(to='people.Star', related_name='favorite_directors', blank=True)
+    movies_seen = models.ManyToManyField(to=Movie, related_name='movies_seen', blank=True, through=MovieSeen)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -62,4 +78,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         # Simplest possible answer: Yes, always
         return True
-

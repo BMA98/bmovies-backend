@@ -23,7 +23,7 @@ class Movie(models.Model):
     genres: all movie genres
     """
     tmdb_id = models.IntegerField(primary_key=True)
-    imdb_id = models.IntegerField(null=True, blank=True)
+    imdb_id = models.CharField(max_length=16, null=True, blank=True)
     original_title = models.CharField(max_length=256)
     title = models.CharField(max_length=256)
     release_date = models.DateField(null=True, blank=True)
@@ -55,11 +55,11 @@ class Genre(models.Model):
     genre_id: unique id
     genre: name for text
     """
-    genre_id = models.IntegerField(primary_key=True)
-    genre = models.CharField(max_length=256)
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=256)
 
     def __str__(self):
-        return self.genre
+        return self.name
 
 
 class Language(models.Model):
@@ -68,11 +68,11 @@ class Language(models.Model):
     language_id: unique id
     language_iso: unique ISO identifier
     """
-    language_id = models.IntegerField(primary_key=True)
-    language_iso = models.CharField(max_length=32)
+    iso = models.CharField(max_length=32, primary_key=True)
+    name = models.CharField(max_length=128, blank=True, null=True)
 
     def __str__(self):
-        return language(self.language_iso)['Name']
+        return language(self.iso)['Autonym']
 
 
 class ProductionCountry(models.Model):
@@ -81,8 +81,8 @@ class ProductionCountry(models.Model):
     country_iso: the iso code of the country
     country_name: the name of the country
     """
-    country_iso = models.CharField(max_length=32)
-    country_name = models.CharField(max_length=128)
+    iso = models.CharField(max_length=32, primary_key=True)
+    name = models.CharField(max_length=128)
 
     def __str__(self):
-        return self.country_name
+        return self.name

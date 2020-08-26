@@ -14,7 +14,7 @@ class People(models.Model):
     deathday: (optional) date of death, null if still alive
     """
     tmdb_id = models.IntegerField(primary_key=True)
-    imdb_id = models.IntegerField(null=True, blank=True)
+    imdb_id = models.CharField(max_length=16, null=True, blank=True)
     name = models.CharField(max_length=1024)
     biography = models.CharField(max_length=8192, null=True, blank=True)
     gender = models.IntegerField(default=0)

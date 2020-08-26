@@ -33,6 +33,13 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class BasicMovieSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ['tmdb_id', 'original_title', 'title', 'poster', 'backdrop']
+
+
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
