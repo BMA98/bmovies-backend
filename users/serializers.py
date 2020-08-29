@@ -4,10 +4,16 @@ from allauth.utils import email_address_exists
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
 
-from .models import User
+from movies.models import Movie
+from movies.serializers import BasicMovieSerializer
+from .models import User, MovieSeen, MovieRank
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for User model, serializes all fields
+    """
+    favorites_movies = BasicMovieSerializer(many=True)
 
     class Meta:
         model = User
@@ -51,3 +57,38 @@ class UserRegisterSerializer(RegisterSerializer):
         setup_user_email(request, user, [])
         user.save()
         return user
+
+
+class MovieSeenSerializer(serializers.ModelSerializer):
+    """
+    Serializer for MovieSeen model, serializes all fields
+    """
+    user = serializers.StringRelatedField()
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+    class Meta:
+        model = MovieSeen
+        fields = '__all__'
+
+
+class MovieRankSerializer(serializers.ModelSerializer):
+    """
+    Serializer for MovieRank model, serializes all fields
+    """
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+    class Meta:
+        model = MovieRank
+        fields = '__all__'
+
+
+class MovieOnlyRankSerializer(serializers.ModelSerializer):
+    """
+    Serializer for MovieRank model, serializes only movie and ranking
+    """
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+    class Meta:
+        model = MovieRank
+        fields = ['movie', 'ranking']

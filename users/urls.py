@@ -1,8 +1,18 @@
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import SimpleRouter
 
-urlpatterns = [
+from users.viewsets import MovieSeenViewSet, MovieRankViewSet, MovieOnlyRankViewSet
+
+router = SimpleRouter()
+router.register('rest-auth/user/movies/ranks', MovieRankViewSet)
+router.register('rest-auth/user/movies/seen', MovieSeenViewSet)
+router.register('ranks', MovieOnlyRankViewSet)
+
+urlpatterns = router.urls
+
+urlpatterns += [
     path('admin/', admin.site.urls),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),

@@ -6,7 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class MovieHistoryViewSet(viewsets.ModelViewSet):
-    queryset = MovieHistory.objects.all()
+    """
+    ViewSet intended to recover all viewing entries for a particular user.
+    Newer entries come first.
+    Authentication is required.
+    """
+    queryset = MovieHistory.objects.all().order_by('-timestamp')
     serializer_class = MovieHistorySerializer
     filter_backends = [DjangoFilterBackend]
     permission_classes = (IsAuthenticated,)

@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone
 
 from movies.models import Movie
 from people.models import People
@@ -13,9 +15,42 @@ class MovieSeen(models.Model):
     """
     user = models.ForeignKey(to='users.User', on_delete=models.CASCADE)
     movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
+    created = models.DateTimeField(editable=False)
+    updated = models.DateTimeField(null=True)
 
     class Meta:
         unique_together = (('user', 'movie'),)
+
+    def save(self, *args, **kwargs):
+        """
+        Update timestamps on save
+        :return:
+        """
+        if not self.id:
+            self.created = timezone.now()
+        self.updated = timezone.now()
+        return super(MovieSeen, self).save(*args, **kwargs)
+
+
+class MovieRank(models.Model):
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE)
+    movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
+    ranking = models.IntegerField(validators=(MinValueValidator(0), MaxValueValidator(5)))
+    created = models.DateTimeField(editable=False)
+    updated = models.DateTimeField(null=True)
+
+    class Meta:
+        unique_together = (('user', 'movie'),)
+
+    def save(self, *args, **kwargs):
+        """
+        Update timestamps on save
+        :return:
+        """
+        if not self.id:
+            self.created = timezone.now()
+        self.updated = timezone.now()
+        return super(MovieRank, self).save(*args, **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin):

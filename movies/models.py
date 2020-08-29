@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from iso_language_codes import language
 
@@ -26,6 +27,7 @@ class Movie(models.Model):
     imdb_id = models.CharField(max_length=16, null=True, blank=True)
     original_title = models.CharField(max_length=256)
     title = models.CharField(max_length=256)
+    year = models.IntegerField(validators=(MinValueValidator(1888), MaxValueValidator(2100)), null=True, blank=True)
     release_date = models.DateField(null=True, blank=True)
     runtime = models.IntegerField(null=True)
     overview = models.CharField(max_length=8192, null=True, blank=True)
@@ -86,3 +88,4 @@ class ProductionCountry(models.Model):
 
     def __str__(self):
         return self.name
+
