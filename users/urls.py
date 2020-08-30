@@ -3,11 +3,12 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 
-from users.viewsets import MovieSeenViewSet, MovieRankViewSet, MovieOnlyRankViewSet
+from users.viewsets import MovieSeenViewSet, MovieRankViewSet, MovieOnlyRankViewSet, UserFavoriteMovieViewSet
 
 router = SimpleRouter()
 router.register('rest-auth/user/movies/ranks', MovieRankViewSet)
 router.register('rest-auth/user/movies/seen', MovieSeenViewSet)
+router.register('rest-auth/user/movies/favorites', UserFavoriteMovieViewSet)
 router.register('ranks', MovieOnlyRankViewSet)
 
 urlpatterns = router.urls

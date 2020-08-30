@@ -72,8 +72,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'users.serializers.UserRegisterSerializer',
 }
+
+ACCOUNT_ADAPTER = 'users.adapters.UserAdapter'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

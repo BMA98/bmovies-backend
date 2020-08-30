@@ -3,7 +3,8 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from users.models import User, MovieSeen, MovieRank
-from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer
+from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
+    UserFavoriteMovieSerializer
 
 
 class MovieSeenViewSet(viewsets.ModelViewSet):
@@ -51,3 +52,19 @@ class MovieOnlyRankViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = MovieOnlyRankSerializer
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['movie']
+
+
+class UserFavoriteMovieViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserFavoriteMovieSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ['favorites_movies']
+
+    def get_queryset(self):
+        queryset = self.queryset
+        query_set = queryset.filter(id=self.request.user.id)
+        return query_set
+
+    def perform_update(self, serializer):
+        serializer.save()

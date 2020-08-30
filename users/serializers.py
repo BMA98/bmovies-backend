@@ -40,6 +40,7 @@ class UserRegisterSerializer(RegisterSerializer):
     def validate(self, data):
         if data['password1'] != data['password2']:
             raise serializers.ValidationError("Passwords didn't match.")
+        return data
 
     def get_cleaned_data(self):
         return {
@@ -48,15 +49,6 @@ class UserRegisterSerializer(RegisterSerializer):
             'password1': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', ''),
         }
-
-    def save(self, request):
-        adapter = get_adapter()
-        user = adapter.new_user(request)
-        self.cleaned_data = self.get_cleaned_data()
-        adapter.save_user(request, user, self)
-        setup_user_email(request, user, [])
-        user.save()
-        return user
 
 
 class MovieSeenSerializer(serializers.ModelSerializer):
@@ -92,3 +84,12 @@ class MovieOnlyRankSerializer(serializers.ModelSerializer):
     class Meta:
         model = MovieRank
         fields = ['movie', 'ranking']
+
+
+class UserFavoriteMovieSerializer(serializers.ModelSerializer):
+
+    favorites_movies = BasicMovieSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = ['favorites_movies']

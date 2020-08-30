@@ -11,7 +11,7 @@ class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['cast__tmdb_id']
+    filter_fields = ['cast__tmdb_id', 'directors__tmdb_id', 'screenwriters__tmdb_id', 'photography_directors__tmdb_id']
 
 
 class GenreViewSet(viewsets.ModelViewSet):
