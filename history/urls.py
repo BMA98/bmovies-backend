@@ -4,6 +4,6 @@ from .viewsets import MovieHistoryViewSet
 
 router = routers.SimpleRouter()
 
-router.register('history', MovieHistoryViewSet)
+router.register('rest-auth/user/history', MovieHistoryViewSet)
 
 urlpatterns = router.urls

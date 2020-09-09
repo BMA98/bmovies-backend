@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from movies.models import Movie
 from movies.serializers import BasicMovieSerializer
-from .models import User, MovieSeen, MovieRank
+from .models import User, MovieSeen, MovieRank, UserFavoriteMovie
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -88,8 +88,15 @@ class MovieOnlyRankSerializer(serializers.ModelSerializer):
 
 class UserFavoriteMovieSerializer(serializers.ModelSerializer):
 
-    favorites_movies = BasicMovieSerializer(many=True)
+    class Meta:
+        model = UserFavoriteMovie
+        fields = '__all__'
+
+
+class UserFullFavoriteMovieSerializer(serializers.ModelSerializer):
+
+    movie = BasicMovieSerializer()
 
     class Meta:
-        model = User
-        fields = ['favorites_movies']
+        model = UserFavoriteMovie
+        fields = '__all__'

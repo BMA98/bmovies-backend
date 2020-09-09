@@ -33,9 +33,12 @@ class MovieSeen(models.Model):
 
 
 class MovieRank(models.Model):
+    """
+    Keeps track of movie ranks by each user
+    """
     user = models.ForeignKey(to='users.User', on_delete=models.CASCADE)
     movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
-    ranking = models.IntegerField(validators=(MinValueValidator(0), MaxValueValidator(5)))
+    ranking = models.IntegerField(validators=(MinValueValidator(0), MaxValueValidator(10)))
     created = models.DateTimeField(editable=False)
     updated = models.DateTimeField(null=True)
 
@@ -53,6 +56,27 @@ class MovieRank(models.Model):
         return super(MovieRank, self).save(*args, **kwargs)
 
 
+class UserFavoriteMovie(models.Model):
+    """
+    Keeps track of favorite movies for each user
+    """
+    user = models.ForeignKey(to='users.User', on_delete=models.CASCADE)
+    movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
+    created = models.DateTimeField(editable=False)
+
+    class Meta:
+        unique_together = (('user', 'movie'),)
+
+    def save(self, *args, **kwargs):
+        """
+        Creates timestamps on save
+        :return:
+        """
+        if not self.id:
+            self.created = timezone.now()
+        return super(UserFavoriteMovie, self).save(*args, **kwargs)
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom user class which includes favorites movies, favorites people
@@ -67,9 +91,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     active = models.BooleanField(default=True)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    favorites_movies = models.ManyToManyField(to=Movie, related_name='favorite_movies', blank=True)
-    favorites_stars = models.ManyToManyField(to='people.Star', related_name='favorite_stars',blank=True)
-    favorites_directors = models.ManyToManyField(to='people.Star', related_name='favorite_directors', blank=True)
+    favorites_movies = models.ManyToManyField(to=Movie, related_name='favorite_movies', blank=True, through='users.UserFavoriteMovie')
+    #favorites_stars = models.ManyToManyField(to='people.Star', related_name='favorite_stars',blank=True)
+    #favorites_directors = models.ManyToManyField(to='people.Star', related_name='favorite_directors', blank=True)
     movies_seen = models.ManyToManyField(to=Movie, related_name='movies_seen', blank=True, through=MovieSeen)
 
     USERNAME_FIELD = 'email'

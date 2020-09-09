@@ -1,10 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 
-from users.models import User, MovieSeen, MovieRank
+from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
-    UserFavoriteMovieSerializer
+    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer
 
 
 class MovieSeenViewSet(viewsets.ModelViewSet):
@@ -46,7 +48,7 @@ class MovieRankViewSet(viewsets.ModelViewSet):
 
 class MovieOnlyRankViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Serializer intended to get all movie ranks, able to filter by movie.
+    Viewset intended to get all movie ranks, able to filter by movie.
     """
     queryset = MovieRank.objects.all()
     serializer_class = MovieOnlyRankSerializer
@@ -55,16 +57,38 @@ class MovieOnlyRankViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UserFavoriteMovieViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    """
+    Viewset intended to get all favorite movies related to an user, able to filter by movie.
+    Authentication is required.
+    """
+    queryset = UserFavoriteMovie.objects.all()
     serializer_class = UserFavoriteMovieSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['favorites_movies']
+    filter_fields = ['movie']
 
     def get_queryset(self):
         queryset = self.queryset
-        query_set = queryset.filter(id=self.request.user.id)
+        query_set = queryset.filter(user_id=self.request.user.id)
         return query_set
 
-    def perform_update(self, serializer):
-        serializer.save()
+
+class UserFullFavoriteMovieViewSet(viewsets.ModelViewSet):
+    """
+    Viewset intended to get all favorite movies related to an user, able to filter by movie.
+    Authentication is required.
+    """
+    queryset = UserFavoriteMovie.objects.all()
+    serializer_class = UserFullFavoriteMovieSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 25
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_fields = ['movie']
+    search_fields = ['movie__original_title']
+
+    def get_queryset(self):
+        queryset = self.queryset
+        query_set = queryset.filter(user_id=self.request.user.id)
+        return query_set
+

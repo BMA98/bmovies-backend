@@ -3,11 +3,15 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 from users.forms import UserAdminChangeForm, UserAdminCreationForm
-from users.models import User, MovieRank
+from users.models import User, MovieRank, MovieSeen
 
 
 class MovieSeenAdmin(admin.TabularInline):
     model = User.movies_seen.through
+
+
+class MovieFavoritesAdmin(admin.TabularInline):
+    model = User.favorites_movies.through
 
 
 class UserAdmin(BaseUserAdmin):
@@ -22,7 +26,8 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password',)}),
-        ('Personal info', {'fields': ('name', 'lastname', 'favorites_stars', 'favorites_directors', 'favorites_movies')}),
+        ('Personal info',
+         {'fields': ('name', 'lastname')}),
         ('Permissions', {'fields': ('admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -30,10 +35,11 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('name', 'lastname', 'email', 'password1', 'password2', 'favorites_stars', 'favorites_directors', 'favorites_movies',)}
-        ),
+            'fields': ('name', 'lastname', 'email', 'password1', 'password2',)
+        }
+         ),
     )
-    inlines = (MovieSeenAdmin,)
+    inlines = (MovieSeenAdmin, MovieFavoritesAdmin)
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
@@ -41,3 +47,4 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(MovieRank)
+admin.site.register(MovieSeen)
