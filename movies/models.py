@@ -30,7 +30,7 @@ class Movie(models.Model):
     year = models.IntegerField(validators=(MinValueValidator(1888), MaxValueValidator(2100)), null=True, blank=True)
     release_date = models.DateField(null=True, blank=True)
     runtime = models.IntegerField(null=True)
-    overview = models.CharField(max_length=8192, null=True, blank=True)
+    overview = models.TextField(max_length=8096, null=True, blank=True)
     poster = models.CharField(max_length=256, null=True, blank=True)
     backdrop = models.CharField(max_length=256, null=True, blank=True)
     language = models.ForeignKey(to='Language', on_delete=models.CASCADE)

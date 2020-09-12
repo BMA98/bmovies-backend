@@ -16,7 +16,7 @@ class People(models.Model):
     tmdb_id = models.IntegerField(primary_key=True)
     imdb_id = models.CharField(max_length=16, null=True, blank=True)
     name = models.CharField(max_length=1024)
-    biography = models.CharField(max_length=8192, null=True, blank=True)
+    biography = models.TextField(max_length=8096, null=True, blank=True)
     gender = models.IntegerField(default=0)
     profile_path = models.CharField(max_length=1024, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
