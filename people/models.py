@@ -20,6 +20,7 @@ class People(models.Model):
     gender = models.IntegerField(default=0)
     profile_path = models.CharField(max_length=1024, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
+    birthplace = models.CharField(max_length=256, null=True)
     deathday = models.DateField(null=True, blank=True)
 
     def __str__(self):

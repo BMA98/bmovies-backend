@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from people.serializers import PeopleSerializer
-from .models import Movie, Genre, Language, ProductionCountry
+from .models import Movie, Genre, Language, ProductionCountry, MovieRole
 
 
 class LanguageSerializer(serializers.ModelSerializer):
@@ -17,6 +17,16 @@ class ProductionCountrySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class MovieRoleSerializer(serializers.ModelSerializer):
+    #movie = serializers.Field(source='cast.movie.tmdb_id')
+    star = PeopleSerializer()
+    role = serializers.CharField()
+
+    class Meta:
+        model = MovieRole
+        fields = ['star', 'role']
+
+
 class MovieSerializer(serializers.ModelSerializer):
 
     language = serializers.StringRelatedField()
@@ -26,7 +36,7 @@ class MovieSerializer(serializers.ModelSerializer):
     photography_directors = PeopleSerializer(many=True)
     screenwriters = PeopleSerializer(many=True)
     producers = PeopleSerializer(many=True)
-    cast = PeopleSerializer(many=True)
+    cast = MovieRoleSerializer(source='movierole_set', many=True)
 
     class Meta:
         model = Movie

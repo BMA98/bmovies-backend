@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import PermissionDenied
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
@@ -53,7 +54,11 @@ class MovieRank(models.Model):
         if not self.id:
             self.created = timezone.now()
         self.updated = timezone.now()
-        return super(MovieRank, self).save(*args, **kwargs)
+        seen = MovieSeen.objects.filter(movie=self.movie, user=self.user).exists()
+        if seen:
+            return super(MovieRank, self).save(*args, **kwargs)
+        else:
+            raise PermissionDenied(f'{self.movie} has not been seen by user {self.user}')
 
 
 class UserFavoriteMovie(models.Model):

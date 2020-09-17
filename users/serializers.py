@@ -56,7 +56,7 @@ class MovieSeenSerializer(serializers.ModelSerializer):
     Serializer for MovieSeen model, serializes all fields
     """
     user = serializers.StringRelatedField()
-    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+    movie = BasicMovieSerializer()
 
     class Meta:
         model = MovieSeen
@@ -69,6 +69,18 @@ class MovieRankSerializer(serializers.ModelSerializer):
     """
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+    class Meta:
+        model = MovieRank
+        fields = '__all__'
+
+
+class MovieDetailedRankSerializer(serializers.ModelSerializer):
+    """
+    Serializer for MovieRank model, serializes all fields
+    """
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    movie = BasicMovieSerializer()
 
     class Meta:
         model = MovieRank
@@ -100,3 +112,4 @@ class UserFullFavoriteMovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserFavoriteMovie
         fields = '__all__'
+

@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
-    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer
+    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer
 
 
 class MovieSeenViewSet(viewsets.ModelViewSet):
@@ -16,8 +16,11 @@ class MovieSeenViewSet(viewsets.ModelViewSet):
     """
     queryset = MovieSeen.objects.all()
     serializer_class = MovieSeenSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['movie__original_title']
     permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 25
     filter_fields = ['user']
 
     def get_queryset(self):
@@ -35,7 +38,30 @@ class MovieRankViewSet(viewsets.ModelViewSet):
     serializer_class = MovieRankSerializer
     filter_backends = [DjangoFilterBackend]
     permission_classes = (IsAuthenticated,)
-    filter_fields = ['movie']
+    filter_fields = ['movie__tmdb_id']
+
+    def get_queryset(self):
+        queryset = self.queryset
+        query_set = queryset.filter(user=self.request.user)
+        return query_set
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+
+class MovieDetailedRankViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet intended to recover all ranks from an user.
+    Authentication is required.
+    """
+    queryset = MovieRank.objects.all()
+    serializer_class = MovieDetailedRankSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['movie__original_title']
+    permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 100
+    filter_fields = ['movie__tmdb_id']
 
     def get_queryset(self):
         queryset = self.queryset

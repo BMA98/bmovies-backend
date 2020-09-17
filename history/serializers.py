@@ -7,7 +7,8 @@ class MovieHistorySerializer(serializers.Serializer):
 
     movie = BasicMovieSerializer()
     user = serializers.StringRelatedField()
-    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S ")
+    channel = serializers.StringRelatedField()
+    timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
         model = MovieHistory

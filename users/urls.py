@@ -4,9 +4,10 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 
 from users.viewsets import MovieSeenViewSet, MovieRankViewSet, MovieOnlyRankViewSet, UserFavoriteMovieViewSet, \
-    UserFullFavoriteMovieViewSet
+    UserFullFavoriteMovieViewSet, MovieDetailedRankViewSet
 
 router = SimpleRouter()
+router.register('rest-auth/user/movies/ranks/detail', MovieDetailedRankViewSet)
 router.register('rest-auth/user/movies/ranks', MovieRankViewSet)
 router.register('rest-auth/user/movies/seen', MovieSeenViewSet)
 router.register('rest-auth/user/movies/favorites/full', UserFullFavoriteMovieViewSet)

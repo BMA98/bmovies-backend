@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = DEBUG_MODE
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bmovie-backend.azurewebsites.net']
 

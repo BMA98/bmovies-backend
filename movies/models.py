@@ -40,7 +40,7 @@ class Movie(models.Model):
     photography_directors = models.ManyToManyField(to='people.PhotographyDirector', blank=True)
     screenwriters = models.ManyToManyField(to='people.ScreenWriter', blank=True)
     producers = models.ManyToManyField(to='people.Producer', blank=True)
-    cast = models.ManyToManyField(to='people.Star', blank=True)
+    cast = models.ManyToManyField(to='people.Star', through='movies.MovieRole', blank=True)
     genres = models.ManyToManyField(to='Genre', blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
 
@@ -49,6 +49,21 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.original_title
+
+
+class MovieRole(models.Model):
+    """
+    Defines a role, given a movie and a movie star
+    movie: the movie id, foreign key
+    star: the star id, foreign key
+    role: the character name, optional
+    """
+    movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
+    star = models.ForeignKey(to='people.Star', on_delete=models.CASCADE)
+    role = models.CharField(max_length=128, null=True)
+
+    def __str__(self):
+        return self.role
 
 
 class Genre(models.Model):
