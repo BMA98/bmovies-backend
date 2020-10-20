@@ -13,3 +13,8 @@ class MovieHistorySerializer(serializers.Serializer):
     class Meta:
         model = MovieHistory
         fields = '__all__'
+
+
+class MovieHistoryUniqueSerializer(serializers.Serializer):
+
+    movie_id = serializers.IntegerField()
