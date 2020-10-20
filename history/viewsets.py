@@ -19,7 +19,7 @@ class MovieHistoryViewSet(viewsets.ModelViewSet):
     serializer_class = MovieHistorySerializer
     filter_backends = [DjangoFilterBackend, SearchFilter,]
     search_fields = ['movie__original_title']
-
+    pagination_class = PageNumberPagination
     permission_classes = (IsAuthenticated,)
     filterset_class = MovieHistoryFilterSet
 
