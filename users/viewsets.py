@@ -118,3 +118,4 @@ class UserFullFavoriteMovieViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(user_id=self.request.user.id)
         return query_set
 
+
