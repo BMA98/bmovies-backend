@@ -31,9 +31,17 @@ class MovieHistoryViewSet(viewsets.ModelViewSet):
 
 
 class MovieHistoryUniqueViewSet(MovieHistoryViewSet):
-
+    queryset = MovieHistory.objects.all()
     serializer_class = MovieHistoryUniqueSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, ]
+    search_fields = ['movie__original_title']
+    pagination_class = PageNumberPagination
+    permission_classes = (IsAuthenticated,)
+    filterset_class = MovieHistoryFilterSet
 
     def get_queryset(self):
-        queryset = super(MovieHistoryViewSet, self).get_queryset()
-        return queryset.values('movie_id').distinct()
+        queryset = self.queryset
+        # distinct required for filtering and pagination to work along together
+        queryset = queryset.distinct().filter(user=self.request.user)
+        queryset = queryset.values('movie_id').distinct()
+        return queryset
