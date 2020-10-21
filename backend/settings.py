@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'people',
     'users',
     'history',
+    'series',
 ]
 
 AUTH_USER_MODEL = 'users.User'
