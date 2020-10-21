@@ -4,6 +4,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 
+from movies.paginations import TenPageNumberPagination
 from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
     UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer
@@ -20,7 +21,6 @@ class MovieSeenViewSet(viewsets.ModelViewSet):
     search_fields = ['movie__original_title']
     permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
-    pagination_class.page_size = 25
     filter_fields = ['user']
 
     def get_queryset(self):
@@ -60,7 +60,6 @@ class MovieDetailedRankViewSet(viewsets.ModelViewSet):
     search_fields = ['movie__original_title']
     permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
-    pagination_class.page_size = 100
     filter_fields = ['movie__tmdb_id']
 
     def get_queryset(self):
@@ -107,8 +106,7 @@ class UserFullFavoriteMovieViewSet(viewsets.ModelViewSet):
     queryset = UserFavoriteMovie.objects.all()
     serializer_class = UserFullFavoriteMovieSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = PageNumberPagination
-    pagination_class.page_size = 25
+    pagination_class = TenPageNumberPagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_fields = ['movie']
     search_fields = ['movie__original_title']

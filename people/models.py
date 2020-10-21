@@ -60,3 +60,10 @@ class Producer(People):
     For producers
     """
     pass
+
+
+class Creator(People):
+    """
+    For Series Creators
+    """
+    pass

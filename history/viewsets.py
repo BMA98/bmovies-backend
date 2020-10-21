@@ -8,6 +8,8 @@ from history.models import MovieHistory
 from history.serializers import MovieHistorySerializer, MovieHistoryUniqueSerializer
 from rest_framework.permissions import IsAuthenticated
 
+from movies.paginations import TenPageNumberPagination
+
 
 class MovieHistoryViewSet(viewsets.ModelViewSet):
     """
@@ -19,7 +21,7 @@ class MovieHistoryViewSet(viewsets.ModelViewSet):
     serializer_class = MovieHistorySerializer
     filter_backends = [DjangoFilterBackend, SearchFilter,]
     search_fields = ['movie__original_title']
-    pagination_class = PageNumberPagination
+    pagination_class = TenPageNumberPagination
     permission_classes = (IsAuthenticated,)
     filterset_class = MovieHistoryFilterSet
 
@@ -35,7 +37,7 @@ class MovieHistoryUniqueViewSet(MovieHistoryViewSet):
     serializer_class = MovieHistoryUniqueSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, ]
     search_fields = ['movie__original_title']
-    pagination_class = PageNumberPagination
+    pagination_class = TenPageNumberPagination
     permission_classes = (IsAuthenticated,)
     filterset_class = MovieHistoryFilterSet
 
