@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import Movie, Genre, Language
+from .paginations import TenPageNumberPagination
 from .serializers import MovieSerializer, GenreSerializer, LanguageSerializer
 
 
@@ -14,8 +15,7 @@ class MovieViewSet(viewsets.ModelViewSet):
     serializer_class = MovieSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter,]
     search_fields = ['original_title']
-    pagination_class = PageNumberPagination
-    pagination_class.page_size = 25
+    pagination_class = TenPageNumberPagination
     filter_fields = ['cast__tmdb_id', 'directors__tmdb_id', 'screenwriters__tmdb_id', 'photography_directors__tmdb_id', 'year', 'genres']
 
 
