@@ -42,6 +42,7 @@ class Movie(models.Model):
     producers = models.ManyToManyField(to='people.Producer', blank=True)
     cast = models.ManyToManyField(to='people.Star', through='movies.MovieRole', blank=True)
     genres = models.ManyToManyField(to='Genre', blank=True)
+    songs = models.ManyToManyField(to='Song', through='movies.MovieSong', blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -104,3 +105,27 @@ class ProductionCountry(models.Model):
     def __str__(self):
         return self.name
 
+
+class Song(models.Model):
+    """
+    Defines a mode for songs
+    name: the name of the song.
+    artist: the name of the artist.
+    spotify: path to spotify track.
+    """
+    name = models.CharField(max_length=256)
+    artist = models.CharField(max_length=256)
+    spotify = models.CharField(max_length=256, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class MovieSong(models.Model):
+    """
+    Defines a many to many relation between movies and songs
+    movie: the movie id.
+    song: the song id.
+    """
+    movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
+    song = models.ForeignKey(to='movies.Song', on_delete=models.CASCADE)
