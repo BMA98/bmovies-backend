@@ -115,7 +115,7 @@ class Song(models.Model):
     """
     name = models.CharField(max_length=256)
     artist = models.CharField(max_length=256)
-    spotify = models.CharField(max_length=256)
+    spotify = models.CharField(max_length=256, null=True)
 
     def __str__(self):
         return self.name
@@ -126,8 +126,6 @@ class MovieSong(models.Model):
     Defines a many to many relation between movies and songs
     movie: the movie id.
     song: the song id.
-    order: the order of the song it should be displayed.
     """
     movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
     song = models.ForeignKey(to='movies.Song', on_delete=models.CASCADE)
-    order = models.IntegerField(null=True)

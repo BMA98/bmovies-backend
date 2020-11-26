@@ -14,19 +14,6 @@ class SongSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MovieSongSerializer(serializers.ModelSerializer):
-    """
-    Serializes the many to many model MovieSong.
-    Only fields song and order.
-    """
-    song = SongSerializer()
-    order = serializers.IntegerField()
-
-    class Meta:
-        model = MovieSong
-        fields = ['song', 'order']
-
-
 class LanguageSerializer(serializers.ModelSerializer):
     """
     Serializes the Language model.
@@ -73,7 +60,7 @@ class MovieSerializer(serializers.ModelSerializer):
     screenwriters = PeopleSerializer(many=True)
     producers = PeopleSerializer(many=True)
     cast = MovieRoleSerializer(source='movierole_set', many=True)
-    songs = SongSerializer()
+    songs = SongSerializer(many=True)
 
     class Meta:
         model = Movie

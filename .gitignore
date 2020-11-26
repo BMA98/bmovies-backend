@@ -1,5 +1,13 @@
 .idea
 migrations
+.env
+*.env
+*.csv
+config2.py
+populatedb.py
+populateseries.py
+populatesongs.py
+variables.txt
 venv
 config.py
 __pycache__
