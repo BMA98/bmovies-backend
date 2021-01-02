@@ -2,12 +2,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from movies.paginations import TenPageNumberPagination
 from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
-    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer
+    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer, UserSerializer
 
 
 class MovieSeenViewSet(viewsets.ModelViewSet):
@@ -19,7 +19,7 @@ class MovieSeenViewSet(viewsets.ModelViewSet):
     serializer_class = MovieSeenSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['movie__original_title']
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsAdminUser)
     pagination_class = PageNumberPagination
     filter_fields = ['user']
 
@@ -116,4 +116,11 @@ class UserFullFavoriteMovieViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(user_id=self.request.user.id)
         return query_set
 
+class UsersViewSet(viewsets.ModelViewSet):
 
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, IsAdminUser)
+    pagination_class = TenPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ['user']
