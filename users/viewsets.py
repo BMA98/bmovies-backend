@@ -116,11 +116,11 @@ class UserFullFavoriteMovieViewSet(viewsets.ModelViewSet):
         query_set = queryset.filter(user_id=self.request.user.id)
         return query_set
 
+
 class UsersViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, IsAdminUser)
     pagination_class = TenPageNumberPagination
-    filter_backends = [DjangoFilterBackend]
-    filter_fields = ['user']
+    filter_backends = [DjangoFilterBackend,]
