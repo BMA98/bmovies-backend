@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from history.models import MovieHistory
-from movies.serializers import BasicMovieSerializer
+from movies.serializers import MovieSerializer
 
 
 class MovieHistorySerializer(serializers.Serializer):
 
-    movie = BasicMovieSerializer()
+    movie = MovieSerializer()
     user = serializers.StringRelatedField()
     channel = serializers.StringRelatedField()
     timestamp = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
