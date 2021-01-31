@@ -22,13 +22,13 @@ class MovieSeenViewSet(viewsets.ModelViewSet):
     serializer_class = MovieSeenSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['movie__original_title']
-    permission_classes = (IsAuthenticated, IsAdminUser)
+    permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
     filter_fields = ['user']
 
     def get_queryset(self):
         queryset = self.queryset
-        query_set = queryset.filter(user=self.request.user)
+        query_set = queryset.filter(user_id=self.request.user.id)
         return query_set
 
 
