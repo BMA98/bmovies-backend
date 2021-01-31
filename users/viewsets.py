@@ -24,7 +24,7 @@ class MovieSeenViewSet(viewsets.ModelViewSet):
     search_fields = ['movie__original_title']
     permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
-    filter_fields = ['user']
+    filter_fields = ['user', 'movie_id']
 
     def get_queryset(self):
         queryset = self.queryset
