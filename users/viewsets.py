@@ -138,15 +138,17 @@ class UserTopStars(viewsets.ModelViewSet):
     If the user is authenticated, it returns values filtered for that particular user. Otherwise it uses global
     information.
     """
+    pagination_class = TenPageNumberPagination
     queryset = Star.objects.all().prefetch_related()
     serializer_class = TopStarSerializer
-    pagination_classes = TenPageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
 
     def get_queryset(self):
         # If the user is authenticated, we filter their movies
+        queryset = self.queryset
         if self.request.user.id:
-            self.queryset = self.queryset.filter(movierole__movie__movieseen__user=self.request.user.id)
+            queryset = queryset.filter(movierole__movie__movieseen__user=self.request.user.id)
         # Counting movies
-        queryset = self.queryset.annotate(movie_count=Count('movierole')).order_by('-movie_count')
+        queryset = queryset.annotate(movie_count=Count('movierole')).order_by('-movie_count', '-tmdb_id')
         return queryset
