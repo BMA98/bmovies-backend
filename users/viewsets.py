@@ -1,10 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Count
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from movies.paginations import TenPageNumberPagination
+from people.models import Star
+from people.serializers import TopStarSerializer
 from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
     UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer, UserSerializer
@@ -118,9 +121,32 @@ class UserFullFavoriteMovieViewSet(viewsets.ModelViewSet):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
-
+    """
+    ViewSet intended to list all users information.
+    Authentication and Admin Privileges are required.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, IsAdminUser)
     pagination_class = TenPageNumberPagination
-    filter_backends = [DjangoFilterBackend,]
+    filter_backends = [DjangoFilterBackend, ]
+
+
+class UserTopStars(viewsets.ModelViewSet):
+    """
+    ViewSet intended to return all stars sorted (descending) by their number of roles.
+    If the user is authenticated, it returns values filtered for that particular user. Otherwise it uses global
+    information.
+    """
+    queryset = Star.objects.all().prefetch_related()
+    serializer_class = TopStarSerializer
+    pagination_classes = TenPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+
+    def get_queryset(self):
+        # If the user is authenticated, we filter their movies
+        if self.request.user.id:
+            self.queryset = self.queryset.filter(movierole__movie__movieseen__user=self.request.user.id)
+        # Counting movies
+        queryset = self.queryset.annotate(movie_count=Count('movierole')).order_by('-movie_count')
+        return queryset
