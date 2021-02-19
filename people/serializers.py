@@ -9,7 +9,7 @@ class StarSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TopStarSerializer(serializers.Serializer):
+class TopPeopleSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         pass

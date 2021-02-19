@@ -6,8 +6,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from movies.paginations import TenPageNumberPagination
-from people.models import Star
-from people.serializers import TopStarSerializer
+from people.models import Star, Director, PhotographyDirector, ScreenWriter
+from people.serializers import TopPeopleSerializer
 from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
     UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer, UserSerializer
@@ -140,7 +140,7 @@ class UserTopStars(viewsets.ModelViewSet):
     """
     pagination_class = TenPageNumberPagination
     queryset = Star.objects.all().prefetch_related()
-    serializer_class = TopStarSerializer
+    serializer_class = TopPeopleSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name']
 
@@ -151,4 +151,70 @@ class UserTopStars(viewsets.ModelViewSet):
             queryset = queryset.filter(movierole__movie__movieseen__user=self.request.user.id)
         # Counting movies
         queryset = queryset.annotate(movie_count=Count('movierole')).order_by('-movie_count', '-tmdb_id')
+        return queryset
+
+
+class UserTopDirectors(viewsets.ModelViewSet):
+    """
+    ViewSet intended to return all directors sorted (descending) by their number of movies.
+    If the user is authenticated, it returns values filtered for that particular user. Otherwise it uses global
+    information.
+    """
+    pagination_class = TenPageNumberPagination
+    queryset = Director.objects.all().prefetch_related()
+    serializer_class = TopPeopleSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        # If the user is authenticated, we filter their movies
+        queryset = self.queryset
+        if self.request.user.id:
+            queryset = queryset.filter(movie__movieseen__user=self.request.user.id)
+        # Counting movies
+        queryset = queryset.annotate(movie_count=Count('movie')).order_by('-movie_count', '-tmdb_id')
+        return queryset
+
+
+class UserTopPhotographyDirectors(viewsets.ModelViewSet):
+    """
+    ViewSet intended to return all directors sorted (descending) by their number of movies.
+    If the user is authenticated, it returns values filtered for that particular user. Otherwise it uses global
+    information.
+    """
+    pagination_class = TenPageNumberPagination
+    queryset = PhotographyDirector.objects.all().prefetch_related()
+    serializer_class = TopPeopleSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        # If the user is authenticated, we filter their movies
+        queryset = self.queryset
+        if self.request.user.id:
+            queryset = queryset.filter(movie__movieseen__user=self.request.user.id)
+        # Counting movies
+        queryset = queryset.annotate(movie_count=Count('movie')).order_by('-movie_count', '-tmdb_id')
+        return queryset
+
+
+class UserTopScreenwriters(viewsets.ModelViewSet):
+    """
+    ViewSet intended to return all directors sorted (descending) by their number of movies.
+    If the user is authenticated, it returns values filtered for that particular user. Otherwise it uses global
+    information.
+    """
+    pagination_class = TenPageNumberPagination
+    queryset = ScreenWriter.objects.all().prefetch_related()
+    serializer_class = TopPeopleSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        # If the user is authenticated, we filter their movies
+        queryset = self.queryset
+        if self.request.user.id:
+            queryset = queryset.filter(movie__movieseen__user=self.request.user.id)
+        # Counting movies
+        queryset = queryset.annotate(movie_count=Count('movie')).order_by('-movie_count', '-tmdb_id')
         return queryset

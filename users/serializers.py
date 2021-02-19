@@ -112,4 +112,3 @@ class UserFullFavoriteMovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserFavoriteMovie
         fields = '__all__'
-
