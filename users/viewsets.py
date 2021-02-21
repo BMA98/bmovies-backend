@@ -10,7 +10,8 @@ from people.models import Star, Director, PhotographyDirector, ScreenWriter
 from people.serializers import TopPeopleSerializer
 from users.models import User, MovieSeen, MovieRank, UserFavoriteMovie
 from users.serializers import MovieSeenSerializer, MovieRankSerializer, MovieOnlyRankSerializer, \
-    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer, UserSerializer
+    UserFavoriteMovieSerializer, UserFullFavoriteMovieSerializer, MovieDetailedRankSerializer, UserSerializer, \
+    UserLanguagesCountSerializer
 
 
 class MovieSeenViewSet(viewsets.ModelViewSet):
@@ -217,4 +218,29 @@ class UserTopScreenwriters(viewsets.ModelViewSet):
             queryset = queryset.filter(movie__movieseen__user=self.request.user.id)
         # Counting movies
         queryset = queryset.annotate(movie_count=Count('movie')).order_by('-movie_count', '-tmdb_id')
+        return queryset
+
+
+class UserLanguagesCount(viewsets.ModelViewSet):
+    pagination_class = TenPageNumberPagination
+    queryset = MovieSeen.objects.all().prefetch_related()
+    serializer_class = UserLanguagesCountSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        # If the user is authenticated, we filter their movies
+        queryset = self.queryset
+        if self.request.user.id and 'year' in self.request.query_params:
+            queryset = queryset.filter(user=self.request.user.id,
+                                       movie__moviehistory__user=self.request.user.id,
+                                       movie__moviehistory__timestamp__year=self.request.query_params['year'])
+        elif self.request.user.id:
+            queryset = queryset.filter(user=self.request.user.id,
+                                       movie__moviehistory__user=self.request.user.id)
+        # Counting movies
+        queryset = queryset.values('movie__language') \
+            .order_by('movie__language') \
+            .annotate(count=Count('movie__language')) \
+            .order_by('-count')
         return queryset

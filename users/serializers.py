@@ -112,3 +112,15 @@ class UserFullFavoriteMovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserFavoriteMovie
         fields = '__all__'
+
+
+class UserLanguagesCountSerializer(serializers.Serializer):
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    language = serializers.CharField(source='movie__language')
+    count = serializers.IntegerField()

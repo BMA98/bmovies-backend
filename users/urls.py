@@ -5,7 +5,7 @@ from rest_framework.routers import SimpleRouter
 
 from users.viewsets import MovieSeenViewSet, MovieRankViewSet, MovieOnlyRankViewSet, UserFavoriteMovieViewSet, \
     UserFullFavoriteMovieViewSet, MovieDetailedRankViewSet, UsersViewSet, UserTopStars, UserTopScreenwriters, \
-    UserTopPhotographyDirectors, UserTopDirectors
+    UserTopPhotographyDirectors, UserTopDirectors, UserLanguagesCount
 
 router = SimpleRouter()
 router.register('rest-auth/user/movies/ranks/detail', MovieDetailedRankViewSet)
@@ -17,6 +17,7 @@ router.register('rest-auth/user/stars', UserTopStars)
 router.register('rest-auth/user/directors', UserTopDirectors)
 router.register('rest-auth/user/photography_directors', UserTopPhotographyDirectors)
 router.register('rest-auth/user/screenwriters', UserTopScreenwriters)
+router.register('rest-auth/user/stats/languages', UserLanguagesCount)
 router.register('rest-auth/users', UsersViewSet)
 router.register('ranks', MovieOnlyRankViewSet)
 urlpatterns = router.urls
