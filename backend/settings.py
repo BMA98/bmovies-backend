@@ -51,9 +51,7 @@ INSTALLED_APPS = [
     'django_filters',
     'movies',
     'people',
-    'users',
-    'history',
-    'series',
+    'users'
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -118,16 +116,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'sql_server.pyodbc',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': DB_NAME,
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
-        'PORT': DB_PORT,
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'unicode_results': True,
-        },
     }
 }
 
@@ -158,8 +151,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
     ],
-    #'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': 'movies.paginations.TenPageNumberPagination',
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
 }
 
 # Internationalization

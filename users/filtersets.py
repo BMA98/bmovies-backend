@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from history.models import MovieHistory
+from users.models import MovieHistory
 
 
 class MovieHistoryFilterSet(filters.FilterSet):
@@ -8,6 +8,7 @@ class MovieHistoryFilterSet(filters.FilterSet):
     class Meta:
         model = MovieHistory
         fields = {
+            'user': ['exact'],
             'timestamp': ['exact', 'year', 'year__gt', 'year__lt'],
             'movie_id': ['exact'],
         }

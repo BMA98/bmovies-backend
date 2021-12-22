@@ -3,11 +3,11 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 from users.forms import UserAdminChangeForm, UserAdminCreationForm
-from users.models import User, MovieRank, MovieSeen
+from users.models import User, MovieRank, MovieHistory, URLToken
 
 
-class MovieSeenAdmin(admin.TabularInline):
-    model = User.movies_seen.through
+class MovieHistoryAdmin(admin.TabularInline):
+    model = User.movie_history.through
 
 
 class MovieFavoritesAdmin(admin.TabularInline):
@@ -39,7 +39,7 @@ class UserAdmin(BaseUserAdmin):
         }
          ),
     )
-    inlines = (MovieSeenAdmin, MovieFavoritesAdmin)
+    #inlines = (MovieHistoryAdmin, MovieFavoritesAdmin)
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
@@ -47,4 +47,5 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(MovieRank)
-admin.site.register(MovieSeen)
+admin.site.register(MovieHistory)
+admin.site.register(URLToken)

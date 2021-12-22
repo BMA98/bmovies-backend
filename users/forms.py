@@ -11,7 +11,7 @@ class UserAdminCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('name', 'lastname', 'email', 'favorites_movies', 'movies_seen')
+        fields = ('name', 'lastname', 'email', 'favorites_movies', 'movie_history')
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -45,7 +45,7 @@ class UserAdminChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('name', 'lastname', 'email', 'password', 'active', 'admin', 'favorites_movies', 'movies_seen')
+        fields = ('name', 'lastname', 'email', 'password', 'active', 'admin', 'favorites_movies', 'movie_history')
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.

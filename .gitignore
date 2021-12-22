@@ -10,4 +10,6 @@ populatesongs.py
 variables.txt
 venv
 config.py
+DB
+reloaddb.py
 __pycache__

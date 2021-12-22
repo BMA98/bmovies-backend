@@ -1,13 +1,11 @@
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
 
-from .models import Movie, Genre, Language
+
 from .paginations import TenPageNumberPagination
-from .serializers import MovieSerializer, GenreSerializer, LanguageSerializer
+from .serializers import MovieSerializer, GenreSerializer
+from .models import Movie, Genre
 
 
 class MovieViewSet(viewsets.ModelViewSet):
@@ -35,14 +33,3 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['genre_id']
-
-
-class LanguageViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for Language model.
-    It allows filter by id.
-    """
-    queryset = Language.objects.all()
-    serializer_class = LanguageSerializer
-    filter_backends = [DjangoFilterBackend]
-    filter_fields = ['language_id']
