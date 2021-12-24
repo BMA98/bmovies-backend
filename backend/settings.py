@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = DEBUG_MODE
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bmovie-backend.azurewebsites.net']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.compute.amazonaws.com']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
