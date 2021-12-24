@@ -10,3 +10,5 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 DEBUG_MODE = os.getenv('DEBUG_MODE', False)
+
+ALLOWED_HOST = os.getenv('ALLOWED_HOST')

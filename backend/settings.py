@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = DEBUG_MODE
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.compute.amazonaws.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', str(ALLOWED_HOST)]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
