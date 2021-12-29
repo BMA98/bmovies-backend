@@ -8,6 +8,8 @@ from users.models import MovieHistory, URLToken
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Count, Sum
+from django.db.models import Q
+
 
 from users.serializers import MovieHistorySerializer
 
@@ -29,14 +31,14 @@ class DataView(viewsets.ViewSet):
         self.queryset = self.queryset.filter(timestamp__year=year)
         # Count by language
         languages = self.queryset.values('movie__language') \
-            .annotate(count=Count('movie__tmdb_id')) \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
         languages = {record['movie__language']: record['count'] for record in list(languages)}
         # Count by star
         top_stars = self.queryset.values('movie__movierole__star_id',
                                          'movie__movierole__star__name',
                                          'movie__movierole__star__profile_path') \
-            .annotate(count=Count('movie__tmdb_id')) \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
         top_stars = [{'tmdb_id': record['movie__movierole__star_id'],
                       'name': record['movie__movierole__star__name'],
@@ -60,9 +62,10 @@ class DataView(viewsets.ViewSet):
                 for record in list(movies)]
             star['movies'] = movies
         # Count by directors
-        top_directors = self.queryset.values('movie__directors__tmdb_id', 'movie__directors__name',
+        top_directors = self.queryset\
+            .values('movie__directors__tmdb_id', 'movie__directors__name',
                                              'movie__directors__profile_path') \
-            .annotate(count=Count('movie__tmdb_id')) \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
         top_directors = [{'tmdb_id': record['movie__directors__tmdb_id'],
                           'name': record['movie__directors__name'],
@@ -71,7 +74,8 @@ class DataView(viewsets.ViewSet):
                          for record in list(top_directors)]
         # Add movies to count
         for director in top_directors:
-            movies = self.queryset.filter(movie__directors__tmdb_id=director['tmdb_id']) \
+            movies = self.queryset\
+                .filter(movie__directors__tmdb_id=director['tmdb_id']) \
                 .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
                 .distinct()
             movies = [{
@@ -91,8 +95,9 @@ class DataView(viewsets.ViewSet):
                               'count': record['count']}
                              for record in list(top_screenwriters)]
         # Count by photography director
-        top_photography_directors = self.queryset.values('movie__photography_directors__tmdb_id',
-                                                         'movie__photography_directors__name') \
+        top_photography_directors = self.queryset\
+            .values('movie__photography_directors__tmdb_id',
+                    'movie__photography_directors__name') \
             .annotate(count=Count('movie__tmdb_id')) \
             .order_by('-count')
         top_photography_directors = [{'tmdb_id': record['movie__photography_directors__tmdb_id'],
@@ -110,13 +115,13 @@ class DataView(viewsets.ViewSet):
         # Sum runtime
         total_runtime = self.queryset.aggregate(Sum('movie__runtime'))
         # Count by genre
-        genres = self.queryset.values('movie__genres__name') \
-            .annotate(count=Count('movie__tmdb_id')) \
+        genres = self.queryset.values('movie__genres__id', 'movie__genres__name') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
-        genres = {record['movie__genres__name']: record['count'] for record in list(genres)}
+        genres = {record['movie__genres__name']: {'id': record['movie__genres__id'], 'count': record['count']} for record in list(genres)}
         # Count by country
         countries = self.queryset.values('movie__countries__iso') \
-            .annotate(count=Count('movie__tmdb_id')) \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
         countries = {record['movie__countries__iso']: record['count'] for record in list(countries)}
         # Total movies
@@ -174,7 +179,6 @@ class DataView(viewsets.ViewSet):
                     'movie__movierole__star__profile_path') \
             .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
-        print(top_stars)
         top_stars = [{'tmdb_id': record['movie__movierole__star_id'],
                       'name': record['movie__movierole__star__name'],
                       'count': record['count'],
@@ -220,3 +224,33 @@ class DataView(viewsets.ViewSet):
                     }]
                 }
         return Response(movies_dict)
+
+    @action(detail=False)
+    def movies(self, request, **kwargs):
+        if not self.authenticate(**kwargs):
+            return HttpResponse(status=401)
+        try:
+            user = self.request.query_params['user_id']
+            year = self.request.query_params['year']
+        except KeyError:
+            user = self.request.user.id
+            year = datetime.date.today().year
+        self.queryset = self.queryset.filter(user_id=user, timestamp__year=year)
+        if 'language' in self.request.query_params:
+            self.queryset = self.queryset.filter(movie__language=self.request.query_params['language'])
+        if 'country' in self.request.query_params:
+            self.queryset = self.queryset.filter(movie__countries__iso=self.request.query_params['country'])
+        if 'month' in self.request.query_params:
+            self.queryset = self.queryset.filter(timestamp__month=self.request.query_params['month'])
+        if 'genre' in self.request.query_params:
+            self.queryset = self.queryset.filter(movie__genres__id=self.request.query_params['genre'])
+        movies = self.queryset\
+            .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop')\
+            .distinct()
+        movies = [{
+            'tmdb_id': movie['movie__tmdb_id'],
+            'original_title': movie['movie__original_title'],
+            'poster': movie['movie__poster'],
+            'backdrop': movie['movie__backdrop'],
+        } for movie in movies]
+        return Response(list(movies))
