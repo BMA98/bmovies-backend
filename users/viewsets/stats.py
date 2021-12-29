@@ -8,10 +8,6 @@ from users.models import MovieHistory, URLToken
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Count, Sum
-from django.db.models import Q
-
-
-from users.serializers import MovieHistorySerializer
 
 
 class DataView(viewsets.ViewSet):
@@ -192,8 +188,8 @@ class DataView(viewsets.ViewSet):
                 top_star_ids.append(star['tmdb_id'])
             else:
                 break
-        # top_star = tmp[random.randint(0, len(tmp) - 1)]
-        movies = self.queryset.filter(timestamp__year=year, movie__movierole__star_id__in=top_star_ids) \
+        movies = self.queryset.filter(timestamp__year=year, movie__movierole__star_id__in=top_star_ids)\
+            .distinct('movie__movierole__movie__tmdb_id') \
             .values('movie__movierole__star_id',
                     'movie__movierole__star__profile_path',
                     'movie__movierole__star__name',
