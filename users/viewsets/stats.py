@@ -189,7 +189,6 @@ class DataView(viewsets.ViewSet):
             else:
                 break
         movies = self.queryset.filter(timestamp__year=year, movie__movierole__star_id__in=top_star_ids)\
-            .distinct('movie__movierole__movie__tmdb_id') \
             .values('movie__movierole__star_id',
                     'movie__movierole__star__profile_path',
                     'movie__movierole__star__name',
