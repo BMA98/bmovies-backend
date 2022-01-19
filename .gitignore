@@ -13,3 +13,6 @@ config.py
 DB
 reloaddb.py
 __pycache__
+*.crt
+*.key
+app
