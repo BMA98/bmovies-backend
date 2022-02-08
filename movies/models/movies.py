@@ -42,6 +42,7 @@ class Movie(models.Model):
     genres = models.ManyToManyField(to='movies.Genre', blank=True)
     songs = models.ManyToManyField(to='movies.Track', through='movies.MovieTrack', blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
+    hide = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['-added_at']

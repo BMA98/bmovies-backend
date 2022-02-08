@@ -3,3 +3,4 @@ from .genres import Genre
 from .movies import Movie
 from .roles import MovieRole
 from .tracks import Track, MovieTrack
+from .playlists import PlaylistRecord, Playlist, Collection, CollectionRecord
