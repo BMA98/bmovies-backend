@@ -3,9 +3,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 
 
-from .paginations import TenPageNumberPagination
-from .serializers import MovieSerializer, GenreSerializer
-from .models import Movie, Genre
+from movies.paginations import TenPageNumberPagination
+from movies.serializers import MovieSerializer, GenreSerializer
+from movies.models import Movie, Genre
 
 
 class MovieViewSet(viewsets.ModelViewSet):

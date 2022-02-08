@@ -14,3 +14,10 @@ class MovieHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = MovieHistory
         fields = ['user', 'movie', 'timestamp', 'channel', 'created']
+
+
+class MovieHistorySerializerBasic(serializers.ModelSerializer):
+
+    class Meta:
+        model = MovieHistory
+        fields = ['user', 'movie', 'timestamp', 'channel', 'created']

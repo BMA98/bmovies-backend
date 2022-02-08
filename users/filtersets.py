@@ -10,5 +10,5 @@ class MovieHistoryFilterSet(filters.FilterSet):
         fields = {
             'user': ['exact'],
             'timestamp': ['exact', 'year', 'year__gt', 'year__lt'],
-            'movie_id': ['exact'],
+            'movie_id': ['exact', 'in'],
         }
