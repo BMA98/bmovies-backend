@@ -21,6 +21,7 @@ class Movie(models.Model):
     producer: all people credited as producer
     cast: all people credited as cast
     genres: all movie genres
+    status: 0 for seen, 1 for high priority, 2 for possible viewing, 3 for low priority
     """
     tmdb_id = models.IntegerField(primary_key=True)
     imdb_id = models.CharField(max_length=16, null=True, blank=True)
@@ -42,7 +43,7 @@ class Movie(models.Model):
     genres = models.ManyToManyField(to='movies.Genre', blank=True)
     songs = models.ManyToManyField(to='movies.Track', through='movies.MovieTrack', blank=True)
     added_at = models.DateTimeField(auto_now_add=True)
-    hide = models.BooleanField(default=True)
+    status = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['-added_at']
