@@ -9,7 +9,7 @@ class MovieRole(models.Model):
     role: the character name, optional
     """
     movie = models.ForeignKey(to='movies.Movie', on_delete=models.CASCADE)
-    star = models.ForeignKey(to='people.Star', on_delete=models.CASCADE)
+    star = models.ForeignKey(to='people.People', on_delete=models.CASCADE)
     role = models.CharField(max_length=128, null=True)
 
     def __str__(self):

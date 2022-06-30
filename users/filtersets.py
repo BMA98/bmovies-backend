@@ -11,4 +11,5 @@ class MovieHistoryFilterSet(filters.FilterSet):
             'user': ['exact'],
             'timestamp': ['exact', 'year', 'year__gt', 'year__lt'],
             'movie_id': ['exact', 'in'],
+            'movie__language': ['exact'],
         }

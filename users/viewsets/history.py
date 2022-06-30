@@ -27,7 +27,7 @@ class MovieHistoryViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         print(f'user {self.request.user.id}')
-        query_set = queryset.filter(user_id=self.request.user.id).order_by('timestamp')
+        query_set = queryset.filter(user_id=self.request.user.id).order_by('-timestamp')
         return query_set
 
     def get_serializer_class(self):

@@ -25,31 +25,3 @@ class People(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Star(People):
-    """
-    For actors and actresses
-    """
-    pass
-
-
-class Director(People):
-    """
-    For movie directors
-    """
-    pass
-
-
-class PhotographyDirector(People):
-    """
-    For photography directors
-    """
-    pass
-
-
-class ScreenWriter(People):
-    """
-    For screenwriters.
-    """
-    pass

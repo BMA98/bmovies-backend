@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from movies.serializers import MovieSerializer
+from movies.serializers import MovieBasicSerializer
 from users.models import MovieHistory
 
 
@@ -9,7 +9,7 @@ class MovieHistorySerializer(serializers.ModelSerializer):
     Serializer for MovieSeen model, serializes all fields
     """
     user = serializers.StringRelatedField()
-    movie = MovieSerializer()
+    movie = MovieBasicSerializer()
 
     class Meta:
         model = MovieHistory

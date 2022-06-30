@@ -24,6 +24,7 @@ class MovieHistory(models.Model):
         Repeated viewings should be keep as independent records
         """
         unique_together = (('user', 'movie', 'timestamp'),)
+        ordering = ['-timestamp']
 
     def __str__(self):
         return f'{self.user} - {self.movie}'

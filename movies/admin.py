@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Movie, Genre, MovieRole, Track, MovieTrack, Playlist, Collection
+from .models import Movie, Genre, Track, MovieTrack, Playlist, Collection, MovieRole
 
 
 # Register your models here.
@@ -31,15 +31,22 @@ class MovieRoleInLine(admin.TabularInline):
     extra = 1
 
 
+class MovieTrackInline(admin.TabularInline):
+    model = Movie.songs.through
+    extra = 1
+
+
 class MovieAdmin(admin.ModelAdmin):
     inlines = (
         MovieRoleInLine,
+        MovieTrackInline,
     )
+
+
 
 
 admin.site.register(Movie, MovieAdmin)
 admin.site.register(Genre)
-admin.site.register(MovieRole)
 admin.register(Track)
 admin.register(MovieTrack)
 admin.site.register(Playlist, PlaylistAdmin)
