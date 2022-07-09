@@ -2,12 +2,12 @@ from rest_framework import serializers
 
 from movies.models import Playlist, Collection, PlaylistRecord
 from movies.models.playlists import CollectionRecord
-from movies.serializers import MovieSerializer
+from movies.serializers import MovieBasicSerializer
 
 
 class PlaylistRecordSerializer(serializers.ModelSerializer):
 
-    movie = MovieSerializer()
+    movie = MovieBasicSerializer()
 
     class Meta:
         model = PlaylistRecord
@@ -34,6 +34,14 @@ class CollectionRecordSerializer(serializers.ModelSerializer):
 class CollectionSerializer(serializers.ModelSerializer):
 
     playlists = CollectionRecordSerializer(source='collectionrecord_set', many=True)
+
+    class Meta:
+        model = Collection
+        fields = '__all__'
+
+
+class CollectionBasicSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Collection
         fields = '__all__'

@@ -31,6 +31,7 @@ class MovieHistoryViewSet(viewsets.ModelViewSet):
         return query_set
 
     def get_serializer_class(self):
+
         if self.action == 'list':
             return self.serializers['list']
         if self.action == 'create':

@@ -6,4 +6,4 @@ from .roles_movies import MovieRoleSerializer
 from .movies import MovieSerializer
 
 
-from .playlists import PlaylistSerializer, CollectionSerializer
+from .playlists import PlaylistSerializer, CollectionSerializer, CollectionBasicSerializer

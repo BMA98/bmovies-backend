@@ -4,7 +4,7 @@ from rest_framework.filters import SearchFilter
 
 from movies.models import Playlist, Collection
 from movies.paginations import TenPageNumberPagination
-from movies.serializers import PlaylistSerializer, CollectionSerializer
+from movies.serializers import PlaylistSerializer, CollectionSerializer, CollectionBasicSerializer
 
 
 class PlaylistViewSet(viewsets.ModelViewSet):
@@ -18,8 +18,19 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
 class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
+    serializers = {
+        'list': CollectionBasicSerializer,
+        'retrieve': CollectionSerializer,
+        'create': CollectionBasicSerializer,
+        'update': CollectionBasicSerializer,
+    }
     filter_backends = [DjangoFilterBackend, SearchFilter, ]
     search_fields = ['name']
     pagination_class = TenPageNumberPagination
     filter_fields = ['id', 'name']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return self.serializers['list']
+        if self.action == 'retrieve':
+            return self.serializers['retrieve']
