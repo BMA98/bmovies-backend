@@ -1,4 +1,3 @@
-from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
@@ -17,6 +16,6 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path('admin/', admin.site.urls),
-    url(r'user/auth/', include('rest_auth.urls')),
-    url(r'user/registration/', include('rest_auth.registration.urls')),
+    path('user/auth/', include('dj_rest_auth.urls')),
+    path('user/registration/', include('dj_rest_auth.registration.urls')),
 ]

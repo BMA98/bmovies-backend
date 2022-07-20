@@ -3,7 +3,7 @@ from rest_framework import serializers
 from movies.serializers import MovieSerializer
 from users.models import User
 
-from rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.registration.serializers import RegisterSerializer
 from allauth.account.adapter import get_adapter
 from allauth.utils import email_address_exists
 

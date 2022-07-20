@@ -31,15 +31,15 @@ class DataView(viewsets.ViewSet):
             .order_by('-count')
         languages = {record['movie__language']: record['count'] for record in list(languages)}
         # Count by star
-        top_stars = self.queryset.values('movie__movierole__star_id',
-                                         'movie__movierole__star__name',
-                                         'movie__movierole__star__profile_path') \
+        top_stars = self.queryset.values('movie__movierole__people_id',
+                                         'movie__movierole__people__name',
+                                         'movie__movierole__people__profile_path') \
             .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
-        top_stars = [{'tmdb_id': record['movie__movierole__star_id'],
-                      'name': record['movie__movierole__star__name'],
+        top_stars = [{'tmdb_id': record['movie__movierole__people_id'],
+                      'name': record['movie__movierole__people__name'],
                       'count': record['count'],
-                      'profile': record['movie__movierole__star__profile_path']
+                      'profile': record['movie__movierole__people__profile_path']
                       }
                      for record in list(top_stars)[:3]]
         # Add movies to count
