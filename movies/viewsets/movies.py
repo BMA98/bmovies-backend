@@ -19,8 +19,7 @@ class MovieViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter,]
     search_fields = ['original_title']
     pagination_class = TenPageNumberPagination
-    filter_fields = [
-                     'year', 'genres', 'genres__name', 'language']
+    filterset_fields = ['tmdb_id', 'year', 'genres', 'genres__name', 'language']
 
 
 class GenreViewSet(viewsets.ModelViewSet):

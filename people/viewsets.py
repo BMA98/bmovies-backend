@@ -9,4 +9,4 @@ class PeopleViewSet(viewsets.ModelViewSet):
     queryset = People.objects.all()
     serializer_class = PeopleSerializer
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['tmdb_id']
+    filterset_fields = ['tmdb_id']

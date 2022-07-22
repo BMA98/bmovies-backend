@@ -15,7 +15,7 @@ class UserFavoriteMovieViewSet(viewsets.ModelViewSet):
     serializer_class = UserFavoriteMovieSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['movie']
+    filterset_fields = ['movie']
 
     def get_queryset(self):
         queryset = self.queryset

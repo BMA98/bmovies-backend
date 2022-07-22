@@ -21,15 +21,15 @@ class MovieRankViewSet(viewsets.ModelViewSet):
     }
     filter_backends = [DjangoFilterBackend]
     permission_classes = (IsAuthenticated,)
-    filter_fields = ['movie__tmdb_id']
+    filterset_fields = ['movie__tmdb_id']
 
     def get_queryset(self):
+        print(f'Request: {self.request.data}')
         queryset = self.queryset
         query_set = queryset.filter(user_id=self.request.user.id)
-        return query_set
+        return query_set.order_by('id')
 
     def get_serializer_class(self):
-        #print(f'Request type: {self.action}')
         if self.action == 'list':
             return self.serializers['get']
         if self.action == 'retrieve':
