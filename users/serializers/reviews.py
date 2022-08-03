@@ -4,7 +4,7 @@ from movies.serializers import MovieBasicSerializer
 from users.models import MovieRank, User
 
 
-class MovieRankSerializer(serializers.ModelSerializer):
+class MovieReviewSerializer(serializers.ModelSerializer):
     """
     Serializer for MovieRank model, serializes all fields
     """
@@ -16,7 +16,7 @@ class MovieRankSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MovieRankBasicSerializer(serializers.ModelSerializer):
+class MovieReviewBasicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovieRank

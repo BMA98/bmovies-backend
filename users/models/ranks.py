@@ -16,13 +16,3 @@ class MovieRank(UserMovieUpdatableMixin, UserMovieOnHistoryMixin):
 
     class Meta:
         unique_together = (('user', 'movie'),)
-
-    def save(self, *args, **kwargs):
-        """
-        Update timestamps on save
-        :return:
-        """
-        if not self.id:
-            self.created = timezone.now()
-        self.updated = timezone.now()
-        return super(MovieRank, self).save(*args, **kwargs)

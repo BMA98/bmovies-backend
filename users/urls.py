@@ -3,10 +3,11 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 
 from users.viewsets import MovieHistoryViewSet, MovieRankViewSet, UserFavoriteMovieViewSet, \
-    UsersViewSet, DataView
+    UsersViewSet, DataView, MovieReviewViewSet
 
 router = SimpleRouter()
 router.register('users/ranks', MovieRankViewSet)
+router.register('users/reviews', MovieReviewViewSet)
 router.register('users/history', MovieHistoryViewSet)
 router.register('users/favorites', UserFavoriteMovieViewSet)
 router.register('users', UsersViewSet)
