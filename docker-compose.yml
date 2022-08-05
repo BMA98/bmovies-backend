@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  django:
+    build: .
+    volumes:
+      - ./app/:/usr/src/app/
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+      - django_makemigrations
+      - django_migrate
+  django_migrate:
+    build: .
+    command: python ./manage.py migrate
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+      - django_makemigrations
+  django_makemigrations:
+    build: .
+    command: python ./manage.py makemigrations
+    depends_on:
+      - db
+  db:
+    image: postgres:14.1-alpine
+    env_file:
+      - .env.dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PORT=${DB_PORT}
+
+volumes:
+  db:
+    driver: local
