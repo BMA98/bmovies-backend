@@ -1,8 +1,9 @@
 from drf_writable_nested.serializers import WritableNestedModelSerializer
+from rest_framework import serializers
 from movies.models import Movie, MovieRole
 from movies.serializers import GenreSerializer, MovieRoleSerializer, TrackSerializer
 from people.models import People
-from people.serializers import PeopleSerializer, PeopleBasicSerializer
+from people.serializers import PeopleBasicSerializer
 
 
 class MovieSerializer(WritableNestedModelSerializer):
@@ -37,3 +38,16 @@ class MovieSerializer(WritableNestedModelSerializer):
             role, _ = MovieRole.objects.get_or_create(movie=movie, star=star, role=role['role'])
         movie.save()
         return movie
+
+
+class TheMovieDBSerializer(serializers.Serializer):
+
+    tmdb_id = serializers.IntegerField()
+    status = serializers.IntegerField(required=False, default=0)
+    trailer = serializers.IntegerField(required=False)
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass

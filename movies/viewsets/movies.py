@@ -1,11 +1,14 @@
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 
 from movies.paginations import TenPageNumberPagination
 from movies.serializers import MovieSerializer, GenreSerializer
 from movies.models import Movie, Genre
+from movies.serializers.movies import TheMovieDBSerializer
+from movies.themoviedb import update_or_create_movie
 
 
 class MovieViewSet(viewsets.ModelViewSet):
@@ -31,3 +34,14 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['genre_id']
+
+
+class MovieInsertViewSet(viewsets.ViewSet):
+
+    permission_classes = (IsAuthenticated, IsAdminUser, )
+
+    def create(self, request):
+        print(request.data)
+        movie = update_or_create_movie(**request.data)
+        return Response(MovieSerializer(movie).data)
+
