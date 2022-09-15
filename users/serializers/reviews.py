@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from movies.serializers import MovieBasicSerializer
-from users.models import MovieRank, User
+from users.models import MovieRank, User, MovieReview
 
 
 class MovieReviewSerializer(serializers.ModelSerializer):
@@ -12,12 +12,12 @@ class MovieReviewSerializer(serializers.ModelSerializer):
     movie = MovieBasicSerializer()
 
     class Meta:
-        model = MovieRank
+        model = MovieReview
         fields = '__all__'
 
 
 class MovieReviewBasicSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = MovieRank
-        fields = ['id', 'user', 'movie', 'ranking']
+        model = MovieReview
+        fields = ['id', 'user', 'movie', 'comment']

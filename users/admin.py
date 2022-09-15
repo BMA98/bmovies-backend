@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 from users.forms import UserAdminChangeForm, UserAdminCreationForm
-from users.models import User, MovieRank, MovieHistory, URLToken
+from users.models import User, MovieRank, MovieHistory, URLToken, Channel, MovieReview
 
 
 class MovieHistoryAdmin(admin.TabularInline):
@@ -47,5 +47,7 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(MovieRank)
+admin.site.register(MovieReview)
 admin.site.register(MovieHistory)
 admin.site.register(URLToken)
+admin.site.register(Channel)
