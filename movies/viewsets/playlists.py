@@ -13,7 +13,7 @@ class PlaylistViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, ]
     search_fields = ['name']
     pagination_class = TenPageNumberPagination
-    filter_fields = ['id', 'name']
+    filterset_fields = ['id', 'name']
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
@@ -27,7 +27,7 @@ class CollectionViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, ]
     search_fields = ['name']
     pagination_class = TenPageNumberPagination
-    filter_fields = ['id', 'name']
+    filterset_fields = ['id', 'name']
 
     def get_serializer_class(self):
         if self.action == 'list':

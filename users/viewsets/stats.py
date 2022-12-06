@@ -11,11 +11,14 @@ from django.db.models import Count, Sum
 
 
 class DataView(viewsets.ViewSet):
-    queryset = MovieHistory.objects.all()
+    queryset = MovieHistory.objects.prefetch_related('movie', 'user').all()
 
     @action(detail=False)
     def report(self, request, **kwargs):
-        if not self.authenticate(**kwargs):
+        """
+        Endpoint for Year in Review
+        """
+        if not self._authenticate(**kwargs):
             return HttpResponse(status=401)
         try:
             year = self.request.query_params['year']
@@ -25,132 +28,25 @@ class DataView(viewsets.ViewSet):
             user = self.request.user.id
         self.queryset = self.queryset.filter(user_id=user)
         self.queryset = self.queryset.filter(timestamp__year=year)
-        # Count by language
-        languages = self.queryset.values('movie__language') \
-            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
-            .order_by('-count')
-        languages = {record['movie__language']: record['count'] for record in list(languages)}
-        # Count by star
-        top_stars = self.queryset.values('movie__movierole__people_id',
-                                         'movie__movierole__people__name',
-                                         'movie__movierole__people__profile_path') \
-            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
-            .order_by('-count')
-        top_stars = [{'tmdb_id': record['movie__movierole__people_id'],
-                      'name': record['movie__movierole__people__name'],
-                      'count': record['count'],
-                      'profile': record['movie__movierole__people__profile_path']
-                      }
-                     for record in list(top_stars)[:3]]
-        # Add movies to count
-        for star in top_stars:
-            movies = self.queryset.filter(movie__cast__tmdb_id=star['tmdb_id']) \
-                .values('movie__tmdb_id', 'movie__original_title', 'movie__poster',
-                        'movie__backdrop', 'movie__movierole__role') \
-                .distinct()
-            movies = [{
-                'tmdb_id': record['movie__tmdb_id'],
-                'original_title': record['movie__original_title'],
-                'poster': record['movie__poster'],
-                'backdrop': record['movie__backdrop'],
-                'role': record['movie__movierole__role']
-            }
-                for record in list(movies)]
-            star['movies'] = movies
-        # Count by directors
-        top_directors = self.queryset\
-            .values('movie__directors__tmdb_id', 'movie__directors__name',
-                                             'movie__directors__profile_path') \
-            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
-            .order_by('-count')
-        top_directors = [{'tmdb_id': record['movie__directors__tmdb_id'],
-                          'name': record['movie__directors__name'],
-                          'count': record['count'],
-                          'profile': record['movie__directors__profile_path']}
-                         for record in list(top_directors)]
-        # Add movies to count
-        for director in top_directors:
-            movies = self.queryset\
-                .filter(movie__directors__tmdb_id=director['tmdb_id']) \
-                .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
-                .distinct()
-            movies = [{
-                'tmdb_id': record['movie__tmdb_id'],
-                'original_title': record['movie__original_title'],
-                'poster': record['movie__poster'],
-                'backdrop': record['movie__backdrop']
-            }
-                for record in list(movies)]
-            director['movies'] = movies
-        # Count by screenwriters
-        top_screenwriters = self.queryset.values('movie__screenwriters__tmdb_id', 'movie__screenwriters__name') \
-            .annotate(count=Count('movie__tmdb_id')) \
-            .order_by('-count')
-        top_screenwriters = [{'tmdb_id': record['movie__screenwriters__tmdb_id'],
-                              'name': record['movie__screenwriters__name'],
-                              'count': record['count']}
-                             for record in list(top_screenwriters)]
-        # Count by photography director
-        top_photography_directors = self.queryset\
-            .values('movie__photography_directors__tmdb_id',
-                    'movie__photography_directors__name') \
-            .annotate(count=Count('movie__tmdb_id')) \
-            .order_by('-count')
-        top_photography_directors = [{'tmdb_id': record['movie__photography_directors__tmdb_id'],
-                                      'name': record['movie__photography_directors__name'],
-                                      'count': record['count']}
-                                     for record in list(top_photography_directors)]
-        # Count by month
-        monthly_viewing = self.queryset.values('timestamp__month') \
-            .annotate(count=Count('movie__tmdb_id')) \
-            .order_by('timestamp__month')
-        tmp = [0] * 12
-        for record in list(monthly_viewing):
-            tmp[record['timestamp__month'] - 1] = record['count']
-        monthly_viewing = tmp
-        # Sum runtime
-        total_runtime = self.queryset.aggregate(Sum('movie__runtime'))
-        # Count by genre
-        genres = self.queryset.values('movie__genres__id', 'movie__genres__name') \
-            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
-            .order_by('-count')
-        genres = {record['movie__genres__name']: {'id': record['movie__genres__id'], 'count': record['count']} for record in list(genres)}
-        # Count by country
-        countries = self.queryset.values('movie__countries__iso') \
-            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
-            .order_by('-count')
-        countries = {record['movie__countries__iso']: record['count'] for record in list(countries)}
-        # Total movies
-        total = MovieHistory.objects.filter(timestamp__year=year).distinct('movie_id').count()
-        history = self.queryset.order_by('timestamp') \
-            .values('id',
-                    'movie__tmdb_id',
-                    'movie__original_title',
-                    'timestamp',
-                    'movie__poster',
-                    'movie__backdrop')
-        history = [{'id': record['id'],
-                    'tmdb_id': record['movie__tmdb_id'],
-                    'original_title': record['movie__original_title'],
-                    'timestamp': record['timestamp'],
-                    'poster': record['movie__poster'],
-                    'backdrop': record['movie__backdrop'],
-                    } for record in history]
-        response = {'top_languages': languages,
-                    'top_stars': top_stars[:3],
-                    'top_directors': top_directors[:3],
-                    'top_screenwriters': top_screenwriters[:3],
-                    'top_photography_directors': top_photography_directors[:3],
-                    'minutes': total_runtime['movie__runtime__sum'],
-                    'monthly_viewing': monthly_viewing,
-                    'top_genres': genres,
-                    'countries': countries,
-                    'total': total,
-                    'history': history,
+        response = {'top_languages': self._get_languages(),
+                    'top_stars': self._get_top_stars(),
+                    'top_directors': self._get_top_people('directors'),
+                    'top_screenwriters:': self._get_top_people('screenwriters'),
+                    'top_photography_directors': self._get_top_people('photography_directors'),
+                    'minutes': self.queryset.aggregate(Sum('movie__runtime'))['movie__runtime__sum'],
+                    'monthly_viewing': self._get_monthly_viewing(),
+                    'top_genres': self._get_genres(),
+                    'countries': self._get_countries(),
+                    'total': MovieHistory.objects.filter(timestamp__year=year).order_by().distinct('movie').count(),
+                    'history': self._get_history(),
+                    'platforms': self._get_top_platforms(),
                     }
         return Response(response)
 
-    def authenticate(self, **kwargs):
+    def _authenticate(self, **kwargs):
+        """
+        Authentication by key or URL Token
+        """
         if self.request.user.is_authenticated:
             return True
         else:
@@ -160,7 +56,11 @@ class DataView(viewsets.ViewSet):
 
     @action(detail=False)
     def top_stars(self, request, **kwargs):
-        if not self.authenticate(**kwargs):
+        """
+        Endpoint for getting the top stars across time and
+        the subset of movies seen this year that includes them
+        """
+        if not self._authenticate(**kwargs):
             return HttpResponse(status=401)
         try:
             user = self.request.query_params['user_id']
@@ -170,12 +70,12 @@ class DataView(viewsets.ViewSet):
             year = datetime.date.today().year
         self.queryset = self.queryset.filter(user_id=user)
         top_stars = self.queryset \
-            .values('movie__movierole__star_id',
+            .values('movie__movierole__star__tmdb_id',
                     'movie__movierole__star__name',
                     'movie__movierole__star__profile_path') \
             .annotate(count=Count('movie__tmdb_id', distinct=True)) \
             .order_by('-count')
-        top_stars = [{'tmdb_id': record['movie__movierole__star_id'],
+        top_stars = [{'tmdb_id': record['movie__movierole__star__tmdb_id'],
                       'name': record['movie__movierole__star__name'],
                       'count': record['count'],
                       'profile': record['movie__movierole__star__profile_path']
@@ -188,8 +88,8 @@ class DataView(viewsets.ViewSet):
                 top_star_ids.append(star['tmdb_id'])
             else:
                 break
-        movies = self.queryset.filter(timestamp__year=year, movie__movierole__star_id__in=top_star_ids)\
-            .values('movie__movierole__star_id',
+        movies = self.queryset.filter(timestamp__year=year, movie__movierole__star_id__in=top_star_ids) \
+            .values('movie__movierole__star__tmdb_id',
                     'movie__movierole__star__profile_path',
                     'movie__movierole__star__name',
                     'movie__movierole__movie__original_title',
@@ -198,8 +98,8 @@ class DataView(viewsets.ViewSet):
                     )
         movies_dict = {}
         for movie in movies:
-            if movie['movie__movierole__star_id'] in movies_dict:
-                movies_dict[movie['movie__movierole__star_id']]['movies'] \
+            if movie['movie__movierole__star__tmdb_id'] in movies_dict:
+                movies_dict[movie['movie__movierole__star__tmdb_id']]['movies'] \
                     .append(
                     {
                         'tmdb_id': movie['movie__movierole__movie__tmdb_id'],
@@ -208,7 +108,7 @@ class DataView(viewsets.ViewSet):
                     })
 
             else:
-                movies_dict[movie['movie__movierole__star_id']] = {
+                movies_dict[movie['movie__movierole__star__tmdb_id']] = {
                     'name': movie['movie__movierole__star__name'],
                     'count': max,
                     'profile_path': movie['movie__movierole__star__profile_path'],
@@ -222,7 +122,11 @@ class DataView(viewsets.ViewSet):
 
     @action(detail=False)
     def movies(self, request, **kwargs):
-        if not self.authenticate(**kwargs):
+        """
+        Filters the history queryset by params in the requests.
+        They can be language, country, month or genre
+        """
+        if not self._authenticate(**kwargs):
             return HttpResponse(status=401)
         try:
             user = self.request.query_params['user_id']
@@ -239,8 +143,10 @@ class DataView(viewsets.ViewSet):
             self.queryset = self.queryset.filter(timestamp__month=self.request.query_params['month'])
         if 'genre' in self.request.query_params:
             self.queryset = self.queryset.filter(movie__genres__id=self.request.query_params['genre'])
-        movies = self.queryset\
-            .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop')\
+        if 'platform' in self.request.query_params:
+            self.queryset = self.queryset.filter(channel__name=self.request.query_params['platform'])
+        movies = self.queryset \
+            .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
             .distinct()
         movies = [{
             'tmdb_id': movie['movie__tmdb_id'],
@@ -249,3 +155,139 @@ class DataView(viewsets.ViewSet):
             'backdrop': movie['movie__backdrop'],
         } for movie in movies]
         return Response(list(movies))
+
+    def _get_languages(self):
+        """
+        Returns a dictionary with language ISO codes as keys and the number of movies in each language
+        """
+        languages = self.queryset.values('movie__language') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
+            .order_by('-count')
+        languages = {record['movie__language']: record['count'] for record in list(languages)}
+        return languages
+
+    def _get_top_stars(self):
+        """
+        Returns a list with the top three stars
+        """
+        top_stars = self.queryset.values('movie__movierole__star__tmdb_id',
+                                         'movie__movierole__star__name',
+                                         'movie__movierole__star__profile_path') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
+            .order_by('-count')
+        top_stars = [{'tmdb_id': record['movie__movierole__star__tmdb_id'],
+                      'name': record['movie__movierole__star__name'],
+                      'count': record['count'],
+                      'profile': record['movie__movierole__star__profile_path']
+                      }
+                     for record in list(top_stars)[:3]]
+        for star in top_stars:
+            movies = self.queryset\
+                .filter(movie__movierole__star__tmdb_id=star['tmdb_id']) \
+                .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
+                .distinct()
+            movies = [{
+                'tmdb_id': record['movie__tmdb_id'],
+                'original_title': record['movie__original_title'],
+                'poster': record['movie__poster'],
+                'backdrop': record['movie__backdrop']
+            }
+                for record in list(movies)]
+            star['movies'] = movies
+        return top_stars
+
+    def _get_top_people(self, role):
+        """
+        Returns a list with top three people (directors, screenwriters, photography directors)
+        """
+        top_people = self.queryset \
+            .values(f'movie__{role}__tmdb_id', f'movie__{role}__name',
+                    f'movie__{role}__profile_path') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
+            .order_by('-count')
+        top_people = [{'tmdb_id': record[f'movie__{role}__tmdb_id'],
+                       'name': record[f'movie__{role}__name'],
+                       'count': record['count'],
+                       'profile': record[f'movie__{role}__profile_path']}
+                      for record in list(top_people)[:3]]
+        # Add movies to count
+        for people in top_people:
+            lookup = {
+                f'movie__{role}__tmdb_id': people['tmdb_id']
+            }
+            movies = self.queryset \
+                .filter(**lookup) \
+                .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
+                .distinct()
+            movies = [{
+                'tmdb_id': record['movie__tmdb_id'],
+                'original_title': record['movie__original_title'],
+                'poster': record['movie__poster'],
+                'backdrop': record['movie__backdrop']
+            }
+                for record in list(movies)]
+            people['movies'] = movies
+        return top_people
+
+    def _get_monthly_viewing(self):
+        """
+        A list where each element is the number of movies seen by month
+        """
+        monthly_viewing = self.queryset.values('timestamp__month') \
+            .annotate(count=Count('movie__tmdb_id')) \
+            .order_by('timestamp__month')
+        tmp = [0] * 12
+        for record in list(monthly_viewing):
+            tmp[record['timestamp__month'] - 1] = record['count']
+        return tmp
+
+    def _get_genres(self):
+        """
+        A dictionary with the count of movies seen by genre
+        """
+        genres = self.queryset.values('movie__genres__id', 'movie__genres__name') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
+            .order_by('-count')
+        genres = {record['movie__genres__name']: {'id': record['movie__genres__id'], 'count': record['count']} for
+                  record in list(genres)}
+        return genres
+
+    def _get_countries(self):
+        """
+        A dictionary with the count of movies seen by country
+        """
+        countries = self.queryset.values('movie__countries__iso') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
+            .order_by('-count')
+        countries = {record['movie__countries__iso']: record['count'] for record in list(countries)}
+        return countries
+
+    def _get_history(self):
+        """
+        Returns a list with the dictionary sorted from old to new
+        """
+        history = self.queryset.order_by('timestamp') \
+            .values('id',
+                    'movie__tmdb_id',
+                    'movie__original_title',
+                    'timestamp',
+                    'movie__poster',
+                    'movie__backdrop')
+        history = [{'id': record['id'],
+                    'tmdb_id': record['movie__tmdb_id'],
+                    'original_title': record['movie__original_title'],
+                    'timestamp': record['timestamp'],
+                    'poster': record['movie__poster'],
+                    'backdrop': record['movie__backdrop'],
+                    } for record in history]
+        return history
+
+    def _get_top_platforms(self):
+        """
+
+        """
+        platforms = self.queryset.values('channel__name') \
+            .annotate(count=Count('movie__tmdb_id', distinct=True)) \
+            .order_by('-count')
+        platforms = {record['channel__name']: record['count'] for record in list(platforms)}
+        return platforms
