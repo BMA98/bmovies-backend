@@ -146,13 +146,15 @@ class DataView(viewsets.ViewSet):
         if 'platform' in self.request.query_params:
             self.queryset = self.queryset.filter(channel__name=self.request.query_params['platform'])
         movies = self.queryset \
-            .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
+            .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop', 'timestamp') \
             .distinct()
         movies = [{
             'tmdb_id': movie['movie__tmdb_id'],
             'original_title': movie['movie__original_title'],
+            'overview': movie['movie__overview'],
             'poster': movie['movie__poster'],
             'backdrop': movie['movie__backdrop'],
+            'timestamp': movie['timestamp']
         } for movie in movies]
         return Response(list(movies))
 
@@ -184,11 +186,12 @@ class DataView(viewsets.ViewSet):
         for star in top_stars:
             movies = self.queryset\
                 .filter(movie__movierole__star__tmdb_id=star['tmdb_id']) \
-                .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
+                .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop') \
                 .distinct()
             movies = [{
                 'tmdb_id': record['movie__tmdb_id'],
                 'original_title': record['movie__original_title'],
+                'overview': record['movie__overview'],
                 'poster': record['movie__poster'],
                 'backdrop': record['movie__backdrop']
             }
@@ -217,10 +220,11 @@ class DataView(viewsets.ViewSet):
             }
             movies = self.queryset \
                 .filter(**lookup) \
-                .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop') \
+                .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop') \
                 .distinct()
             movies = [{
                 'tmdb_id': record['movie__tmdb_id'],
+                'overview': record['movie__overview'],
                 'original_title': record['movie__original_title'],
                 'poster': record['movie__poster'],
                 'backdrop': record['movie__backdrop']
@@ -270,12 +274,14 @@ class DataView(viewsets.ViewSet):
             .values('id',
                     'movie__tmdb_id',
                     'movie__original_title',
+                    'movie__overview',
                     'timestamp',
                     'movie__poster',
                     'movie__backdrop')
         history = [{'id': record['id'],
                     'tmdb_id': record['movie__tmdb_id'],
                     'original_title': record['movie__original_title'],
+                    'overview': record['movie__overview'],
                     'timestamp': record['timestamp'],
                     'poster': record['movie__poster'],
                     'backdrop': record['movie__backdrop'],
