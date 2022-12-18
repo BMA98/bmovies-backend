@@ -222,14 +222,15 @@ class DataView(viewsets.ViewSet):
             }
             movies = self.queryset \
                 .filter(**lookup) \
-                .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop') \
+                .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop', 'timestamp') \
                 .distinct()
             movies = [{
                 'tmdb_id': record['movie__tmdb_id'],
                 'overview': record['movie__overview'],
                 'original_title': record['movie__original_title'],
                 'poster': record['movie__poster'],
-                'backdrop': record['movie__backdrop']
+                'backdrop': record['movie__backdrop'],
+                'timestamp': record['timestamp'],
             }
                 for record in list(movies)]
             people['movies'] = movies
