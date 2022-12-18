@@ -40,6 +40,7 @@ class DataView(viewsets.ViewSet):
                     'total': MovieHistory.objects.filter(timestamp__year=year).order_by().distinct('movie').count(),
                     'history': self._get_history(),
                     'platforms': self._get_top_platforms(),
+                    'tc_records': self._get_timothee_chalamet(),
                     }
         return Response(response)
 
@@ -186,14 +187,15 @@ class DataView(viewsets.ViewSet):
         for star in top_stars:
             movies = self.queryset\
                 .filter(movie__movierole__star__tmdb_id=star['tmdb_id']) \
-                .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop') \
+                .values('movie__tmdb_id', 'movie__original_title', 'movie__overview', 'movie__poster', 'movie__backdrop', 'timestamp') \
                 .distinct()
             movies = [{
                 'tmdb_id': record['movie__tmdb_id'],
                 'original_title': record['movie__original_title'],
                 'overview': record['movie__overview'],
                 'poster': record['movie__poster'],
-                'backdrop': record['movie__backdrop']
+                'backdrop': record['movie__backdrop'],
+                'timestamp': record['timestamp'],
             }
                 for record in list(movies)]
             star['movies'] = movies
@@ -297,3 +299,9 @@ class DataView(viewsets.ViewSet):
             .order_by('-count')
         platforms = {record['channel__name']: record['count'] for record in list(platforms)}
         return platforms
+
+    def _get_timothee_chalamet(self):
+        movies = self.queryset\
+            .filter(movie__movierole__star__tmdb_id=1190668)\
+            .values("movie__tmdb_id", "movie__original_title", "movie__poster", "movie__backdrop", "movie__overview")
+        return {"tc_records": movies}
