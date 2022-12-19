@@ -304,5 +304,13 @@ class DataView(viewsets.ViewSet):
     def _get_timothee_chalamet(self):
         movies = self.queryset\
             .filter(movie__movierole__star__tmdb_id=1190668)\
-            .values("movie__tmdb_id", "movie__original_title", "movie__poster", "movie__backdrop", "movie__overview")
-        return {"tc_records": movies}
+            .values('movie__tmdb_id', 'movie__original_title', 'movie__poster', 'movie__backdrop', 'movie__overview', 'timestamp')
+        movies = [{
+                    'tmdb_id': record['movie__tmdb_id'],
+                    'original_title': record['movie__original_title'],
+                    'overview': record['movie__overview'],
+                    'timestamp': record['timestamp'],
+                    'poster': record['movie__poster'],
+                    'backdrop': record['movie__backdrop'],
+        } for record in movies]
+        return movies
